@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Monster Slayer</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <style>
+        .health-box {
+            background: rgb(33, 163, 7);
+            color: #fff !important;
+        }
+
+        .health-container {
+            background: grey;
+        }
+
+        .game-window {
+            margin: 20px;
+            border: 1px solid black;
+            box-shadow: 3px 3px 10px rgb(163, 163, 163);
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="app">
+            <div class="row center">
+                <div class="col-6 center">
+                    <h1>You</h1>
+                    <div class="health-container">
+                        <div class="health-box" :style="pHealthStyle">
+                            <p>{{ playerHealth }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h1>Monster</h1>
+                    <div class="health-container">
+                        <div class="health-box" :style="mHealthStyle">
+                            <p>{{ monsterHealth }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row game-window center">
+                <button v-if="newGame" @click="newGame = !newGame">Start a new game?</button>
+                <div class="row" v-if="!newGame">
+                    <div class="col-3">
+                        <button @click="attack()">Attack</button>
+                    </div>
+                    <div class="col-3">
+                        <button @click="specialAttack()">Special Attack</button>
+                    </div>
+                    <div class="col-3">
+                        <button @click="heal()">Heal</button>
+                    </div>
+                    <div class="col-3">
+                        <button @click="giveUp()">Give Up</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row game-window center">
+                    <div class="col-6">
+                        <h3>Player attacks</h3>
+                        <ul>
+                            <li v-for="attack in playerAttacks">{{ attack }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <h3>Monster Attacks</h3>
+                        <ul>
+                            <li v-for="attack in monsterAttacks">{{ attack }}</li>
+                        </ul>
+                    </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    playerHealth: 100,
+                    monsterHealth: 100,
+                    newGame: true,
+                    playerAttacks: [],
+                    monsterAttacks: []
+                },
+                computed: {
+                    pHealthStyle: function () {
+                        return {
+                            width: this.playerHealth + "%",
+                        }
+                    },
+                    mHealthStyle: function () {
+                        return {
+                            width: this.monsterHealth + "%",
+                        }
+                    },
+                },
+                methods: {
+                    attack: function () {
+                        var playerAttack = Math.floor((Math.random() * 10) + 1);
+                        this.playerAttacks.push("Attack" + playerAttack);
+                        var monsterAttack = Math.floor((Math.random() * 10) + 1);
+                        this.monsterAttacks.push("Attack" + monsterAttack);
+                        this.playerHealth = this.playerHealth - monsterAttack;
+                        this.monsterHealth = this.monsterHealth - playerAttack;
+                        console.log("attack!");
+                        if (this.playerHealth <= 0) {
+                            alert("monster wins");
+                            this.newGame = true;
+                            this.monsterHealth = 100;
+                            this.playerHealth = 100;
+                        }
+                        if (this.monsterHealth <= 0) {
+                            alert("player wins");
+                            this.newGame = true;
+                            this.monsterHealth = 100;
+                            this.playerHealth = 100;
+                        }
+                    },
+                    heal: function () {
+                        this.playerHealth += 5;
+                        this.playerAttacks.push("Healed" + 5);
+                    },
+                    specialAttack: function () {
+                        var playerAttack = Math.floor((Math.random() * 10) + 1) * 2;
+                        this.playerAttacks.push("Special Attack" + playerAttack);
+                        var monsterAttack = Math.floor((Math.random() * 10) + 1);
+                        this.monsterAttacks.push("Attack" + monsterAttack);
+                        this.playerHealth = this.playerHealth - monsterAttack;
+                        this.monsterHealth = this.monsterHealth - playerAttack;
+                    },
+                    giveUp: function () {
+                        this.playerHealth = 0;
+                        alert("the monster wins");
+                        this.newGame = true;
+                    }
+                },
+
+            });
+        });
+    </script>
+</body>
+
+</html>
